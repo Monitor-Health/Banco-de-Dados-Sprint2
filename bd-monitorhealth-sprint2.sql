@@ -1,5 +1,5 @@
-CREATE DATABASE dbSprint1;
-USE dbSprint1;
+CREATE DATABASE dbMonitorHealth;
+USE dbMonitorHealth;
 
 CREATE TABLE tbEmpresa (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -15,21 +15,23 @@ CREATE TABLE tbEmpresa (
   complemento VARCHAR (20),
   bairro VARCHAR (200),
   cidade VARCHAR (200) NOT NULL,
-  estado VARCHAR (200) NOT NULL
+  estado CHAR (2) NOT NULL
 );
 
 CREATE TABLE tbUsuario (
   id INT PRIMARY KEY AUTO_INCREMENT,
   email VARCHAR (60) NOT NULL,
   senha VARCHAR (60) NOT NULL,
-  permissoes CHAR (13) NOT NULL
+  permissoes CHAR (13) NOT NULL,
+  fkEmpresa INT,
+  CONSTRAINT fkEmpresaConst FOREIGN KEY (fkEmpresa) REFERENCES tbEmpresa(fkEmpresa) 
 );
  
 CREATE TABLE tbSensor (
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	tipo CHAR (21) NOT NULL,
 	dtInstalacao DATE NOT NULL,
-	localInstalado VARCHAR (100) NOT NULL,
+	ambiente VARCHAR (100) NOT NULL,
   fkEmpresa INT,
   FOREIGN KEY (fkEmpresa) REFERENCES tbEmpresa(id) 
 );
@@ -40,7 +42,7 @@ CREATE TABLE tbEntradaSensorTemperatura (
   dt DATETIME NOT NULL,
   fkSensor INT,
   FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
-  );
+);
 
 CREATE TABLE tbEntradaSensorPresenca (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -48,7 +50,7 @@ CREATE TABLE tbEntradaSensorPresenca (
   dt DATETIME NOT NULL,
   fkSensor INT,
   FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
-  );
+);
   
 
 SELECT * FROM tbEmpresa;
