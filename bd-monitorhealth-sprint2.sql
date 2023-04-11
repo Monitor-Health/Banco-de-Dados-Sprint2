@@ -30,24 +30,24 @@ CREATE TABLE tbSensor (
 	tipo CHAR (21) NOT NULL,
 	dtInstalacao DATE NOT NULL,
 	localInstalado VARCHAR (100) NOT NULL,
-  idEmpresa INT,
-  FOREIGN KEY (idEmpresa) REFERENCES tbEmpresa(id) 
+  fkEmpresa INT,
+  FOREIGN KEY (fkEmpresa) REFERENCES tbEmpresa(id) 
 );
 
 CREATE TABLE tbEntradaSensorTemperatura (
   id INT PRIMARY KEY AUTO_INCREMENT,
   valor FLOAT NOT NULL,
   dt DATETIME NOT NULL,
-  idSensor INT,
-  FOREIGN KEY (idSensor) REFERENCES tbSensor(id)
+  fkSensor INT,
+  FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
   );
 
 CREATE TABLE tbEntradaSensorPresenca (
   id INT PRIMARY KEY AUTO_INCREMENT,
   valor BOOLEAN NOT NULL,
   dt DATETIME NOT NULL,
-  idSensor INT,
-  FOREIGN KEY (idSensor) REFERENCES tbSensor(id)
+  fkSensor INT,
+  FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
   );
   
 
