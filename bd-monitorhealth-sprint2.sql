@@ -1,39 +1,63 @@
 CREATE DATABASE dbMonitorHealth;
 USE dbMonitorHealth;
 
+CREATE TABLE tbSegmento(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(200)
+);
+
+CREATE TABLE tbEstado(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    sigla CHAR(2) NOT NULL
+);
+
 CREATE TABLE tbEmpresa (
   id INT PRIMARY KEY AUTO_INCREMENT,
   nomeResposavel VARCHAR (60) NOT NULL,
   nomeFantasia VARCHAR (60) NOT NULL,
-  cnpj CHAR (18) NOT NULL, 
-  segmento VARCHAR (20) NOT NULL,
+  cnpj CHAR (14) NOT NULL,
   tel CHAR (14) NOT NULL,
-  email VARCHAR (30) NOT NULL,
   cep CHAR(10),
-  rua VARCHAR  (200) NOT NULL,
+  tipoLogradouro VARCHAR(100),
+  logradouro VARCHAR (200) NOT NULL,
   numero VARCHAR (5) NOT NULL,
   complemento VARCHAR (20),
   bairro VARCHAR (200),
   cidade VARCHAR (200) NOT NULL,
-  estado CHAR (2) NOT NULL
+  fkEstado INT,
+  fkSegmento INT,
+  CONSTRAINT fkEstadoConst FOREIGN KEY (fkEstado) REFERENCES tbEstado(id),
+  CONSTRAINT fkSegmentoConst FOREIGN KEY (fkSegmento) REFERENCES tbSegmento(id)
+);
+
+CREATE TABLE tbPermissao(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    autoridade VARCHAR(100)
 );
 
 CREATE TABLE tbUsuario (
   id INT PRIMARY KEY AUTO_INCREMENT,
   email VARCHAR (60) NOT NULL,
   senha VARCHAR (60) NOT NULL,
-  permissoes CHAR (13) NOT NULL,
+  fkPermissao INT,
   fkEmpresa INT,
-  CONSTRAINT fkEmpresaConst FOREIGN KEY (fkEmpresa) REFERENCES tbEmpresa(fkEmpresa) 
+  CONSTRAINT fkPermissaoConst FOREIGN KEY (fkPermissao) REFERENCES tbPermissao(id),
+  CONSTRAINT fkEmpresaConst FOREIGN KEY (fkEmpresa) REFERENCES tbEmpresa(id)
 );
- 
+
+CREATE TABLE tbTipoSensor(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    tipo VARCHAR(255)
+);
+
 CREATE TABLE tbSensor (
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	tipo CHAR (21) NOT NULL,
-	dtInstalacao DATE NOT NULL,
-	ambiente VARCHAR (100) NOT NULL,
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  fkTipoSensor INT,
+  dtInstalacao DATE NOT NULL,
+  ambiente VARCHAR (100) NOT NULL,
   fkEmpresa INT,
-  FOREIGN KEY (fkEmpresa) REFERENCES tbEmpresa(id) 
+  CONSTRAINT fkTipoSensorConst FOREIGN KEY (fkTipoSensor) REFERENCES tbTipoSensor(id),
+  CONSTRAINT fkEmpresaConstSensor FOREIGN KEY (fkEmpresa) REFERENCES tbEmpresa(id)
 );
 
 CREATE TABLE tbEntradaSensorTemperatura (
@@ -41,7 +65,7 @@ CREATE TABLE tbEntradaSensorTemperatura (
   valor FLOAT NOT NULL,
   dt DATETIME NOT NULL,
   fkSensor INT,
-  FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
+  CONSTRAINT fkSensorConstTemp FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
 );
 
 CREATE TABLE tbEntradaSensorPresenca (
@@ -49,41 +73,44 @@ CREATE TABLE tbEntradaSensorPresenca (
   valor BOOLEAN NOT NULL,
   dt DATETIME NOT NULL,
   fkSensor INT,
-  FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
+  CONSTRAINT fkSensorConstPres FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
 );
-  
 
-SELECT * FROM tbEmpresa;
-SELECT * FROM tbUsuario;
-SELECT * FROM tbSensor;
-SELECT * FROM tbEntradaSensorTemperatura;
-SELECT * FROM tbEntradaSensorPresenca;
+INSERT INTO tbEstado VALUES
+(NULL, 'SP'),
+(NULL, 'MG');
 
--- Permissão basica: Apenas visualização dos dados;
--- Permissão intermediario: Visualização dos dados, permissão para alterar algumas configurações;
--- Permissão total: Permissão para realizar todas as ações dentro do sistema, incluindo criar novos usuarios dentro da empresa.
-ALTER TABLE tbusuario
-	ADD  CONSTRAINT chkPermissao CHECK (permissoes IN ('basico', 'intermediario', 'total'));
-   
--- Diferenciar os sensores entre o sensor de presença ou o de temperatura e umidade
-ALTER TABLE tbSensor
-	ADD CONSTRAINT chkTipo CHECK (tipo IN ('presenca', 'temperatura'));
-    
-    
--- INSERT Empresa
+INSERT INTO tbSegmento VALUES
+(NULL, 'Farmacêutico'),
+(NULL, 'Seguros de saúde'),
+(NULL, 'Tecnologia da Informação em Saúde');
+
 INSERT INTO tbEmpresa VALUES
-(null,'Fulano 1','QLL Logística', '12.610.534/0001-19', 'Medicamentos', '(11)3185-4820' , 'contato@qll.com.br','07182-000',
-'Av. Sargtbempresaento da Aeronáutica Jaime Regalo Pereira', 563 , null, 'Jardim Cumbica', 'Guarulhos', 'SP');
+(NULL,'Fulano 1','QLL Logística', '12610534000119', '(11)3185-4820' ,'07182-000', 'Avenida',
+'Jaime Regalo Pereira', '563' , null, 'Jardim Cumbica', 'Guarulhos', 1, 2);
 
--- INSERT Usuario
+INSERT INTO tbPermissao VALUES
+(NULL, 'ADMIN'),
+(NULL, 'OPERADOR');
+
 INSERT INTO tbUsuario VALUES
-(null,'Ricardo Vicente', '123#Asd', 'intermediario', 1),
-(null,'Mark Zuckenberg', 'Mark@012', 'basico', 2),
-(null,'Guilherme Scarabelli', 'Gui#212', 'intermediario', 3),
-(null,'Alan Turing', 'loveComputacao#1912', 'total', 4),
-(null,'Ada Lovelace', 'PrimeiroAlgoritmo@1815', 'total', 5);
+(NULL, 'mariabrown@gmail.com', 'maria12345', 1, 1),
+(NULL, 'alexgreen@gmail.com', 'alex12345', 2, 1);
 
--- INSERT Sensor
+INSERT INTO tbTipoSensor VALUES
+(NULL, 'Presença'),
+(NULL, 'Temperatura'),
+(NULL, 'Umidade'),
+(NULL, 'Bloqueio');
+
 INSERT INTO tbSensor VALUES
-(null,'Presença', '2022-12-15', 'geladeira 150L'),
-(null,'Temperatura', '2020-02-24', 'geladeira 150L');
+(NULL, 1, '2022-12-15', 'geladeira 150L', 1),
+(NULL, 2, '2020-02-24', 'geladeira 150L', 1);
+
+SELECT * FROM tbSegmento;
+SELECT * FROM tbEstado;
+SELECT * FROM tbEmpresa;
+SELECT * FROM tbPermissao;
+SELECT * FROM tbUsuario;
+SELECT * FROM tbTipoSensor;
+SELECT * FROM tbSensor;
