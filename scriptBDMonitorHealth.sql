@@ -47,7 +47,7 @@ CREATE TABLE tbUsuario (
 
 CREATE TABLE tbTipoSensor(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    tipo VARCHAR(255)
+    tipo VARCHAR(100)
 );
 
 CREATE TABLE tbSensor (
@@ -60,21 +60,14 @@ CREATE TABLE tbSensor (
   CONSTRAINT fkEmpresaConstSensor FOREIGN KEY (fkEmpresa) REFERENCES tbEmpresa(id)
 );
 
-CREATE TABLE tbEntradaSensorTemperatura (
-  id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE tbEntradaSensor (
   valor FLOAT NOT NULL,
-  dt DATETIME NOT NULL,
+  dt_hora DATETIME NOT NULL,
   fkSensor INT,
-  CONSTRAINT fkSensorConstTemp FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
+  CONSTRAINT fkSensorConstTemp FOREIGN KEY (fkSensor) REFERENCES tbSensor(id),
+  constraint pkComposta primary key (fkSensor, dt_hora)
 );
 
-CREATE TABLE tbEntradaSensorPresenca (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  valor BOOLEAN NOT NULL,
-  dt DATETIME NOT NULL,
-  fkSensor INT,
-  CONSTRAINT fkSensorConstPres FOREIGN KEY (fkSensor) REFERENCES tbSensor(id)
-);
 
 INSERT INTO tbEstado VALUES
 (NULL, 'SP'),
@@ -99,13 +92,17 @@ INSERT INTO tbUsuario VALUES
 
 INSERT INTO tbTipoSensor VALUES
 (NULL, 'Presença'),
-(NULL, 'Temperatura'),
-(NULL, 'Umidade'),
-(NULL, 'Bloqueio');
+(NULL, 'Temperatura');
 
 INSERT INTO tbSensor VALUES
 (NULL, 1, '2022-12-15', 'geladeira 150L', 1),
 (NULL, 2, '2020-02-24', 'geladeira 150L', 1);
+
+INSERT INTO tbEntradaSensor values
+(20.8, '2023-01-01 12:00:00', 3),
+(21.8, '2023-01-01 12:01:00', 3),
+(20.8, '2023-01-01 12:00:00', 4),
+(21.8, '2023-01-01 12:01:00', 4);
 
 SELECT * FROM tbSegmento;
 SELECT * FROM tbEstado;
@@ -114,3 +111,10 @@ SELECT * FROM tbPermissao;
 SELECT * FROM tbUsuario;
 SELECT * FROM tbTipoSensor;
 SELECT * FROM tbSensor;
+select * from tbEntradaSensor;
+
+select * from tbEmpresa
+	join tbSensor
+		on tbSensor.fkEmpresa = tbEmpresa.id
+			join tbEntradaSensor
+				on tbEntradaSensor.fkSensor = tbSensor.id;
